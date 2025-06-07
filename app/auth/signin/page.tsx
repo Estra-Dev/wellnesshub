@@ -9,11 +9,54 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Basic validation
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Simulate API call for authentication
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // For demo purposes, accept any email/password combination
+      // In real app, this would be an actual API call
+      console.log("Login attempt:", { email, password });
+
+      // Simulate successful login
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userEmail", email);
+
+      // Redirect to dashboard
+      router.push("/");
+    } catch (err) {
+      setError("Login failed. Please check your credentials and try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-2 md:p-7">
       <div className=" h-full p-3 w-full max-w-6xl">
@@ -35,74 +78,84 @@ const page = () => {
                 <span className=" text-[#4285f4]"> John🖐</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1">
+            <CardContent>
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                {error && (
+                  <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                    {error}
+                  </div>
+                )}
+                <div className="grid grid-cols-1">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email Address</Label>
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-12 pl-10 border-[0.5px] border-gray-500/30 focus:border-[#4285f4] w-full outline-none"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-12 pl-10 border-[0.5px] border-gray-500/30 focus:border-[#4285f4] w-full outline-none"
-                  />
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="h-12 pl-10 border-[0.5px] border-gray-500/30 focus:border-[#4285f4] w-full outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="h-12 pl-10 border-[0.5px] border-gray-500/30 focus:border-[#4285f4] w-full outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label className="flex items-center space-x-2 text-sm">
-                  <input type="checkbox" className="rounded border-gray-300" />
-                  <span className="text-gray-600">Remember me</span>
-                </label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-blue-600 text-sm hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
-              <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium">
-                Sign In
-              </Button>
-
-              <div className="text-center">
-                <p className="text-gray-600 text-sm">
-                  {"Don't have an account? "}
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                    />
+                    <span className="text-gray-600">Remember me</span>
+                  </label>
                   <Link
-                    href="/auth/signup"
-                    className="text-blue-600 hover:underline font-medium"
+                    href="/auth/forgot-password"
+                    className="text-blue-600 text-sm hover:underline"
                   >
-                    Sign up
+                    Forgot password?
                   </Link>
-                </p>
-              </div>
+                </div>
+
+                <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium">
+                  Sign In
+                </Button>
+
+                <div className="text-center">
+                  <p className="text-gray-600 text-sm">
+                    {"Don't have an account? "}
+                    <Link
+                      href="/auth/signup"
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      Sign up
+                    </Link>
+                  </p>
+                </div>
+              </form>
             </CardContent>
           </Card>
           <div className=" hidden md:block flex-1 h-full relative rounded-2xl overflow-hidden">

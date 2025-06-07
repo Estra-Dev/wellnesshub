@@ -110,9 +110,9 @@ export default function VerifyEmailPage() {
               </p>
               <Button
                 asChild
-                className="w-full bg-blue-600 hover:bg-blue-700 mb-4"
+                className="w-full bg-blue-600 hover:bg-blue-700 mb-4 text-white"
               >
-                <Link href="/auth/onboarding">Continue to App</Link>
+                <Link href="/">Continue to App</Link>
               </Button>
               <Button asChild variant="outline" className="w-full">
                 <Link href="/auth/signin">Sign In</Link>
