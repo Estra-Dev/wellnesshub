@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import { useAuth } from "./Auth-Provider";
 
 interface SidebarProps {
   className?: string;
@@ -36,6 +37,7 @@ export function NavBar({ className }: SidebarProps) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const { user, logout } = useAuth();
 
   // Handle window resize to close sidebar on larger screens
   useEffect(() => {
@@ -59,6 +61,13 @@ export function NavBar({ className }: SidebarProps) {
   if (!isMounted) {
     return null;
   }
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const fullName = user?.fullName ? `${user.fullName}` : user?.name || "User";
+  const userEmail = user?.email || "user@example.com";
 
   return (
     <>
@@ -147,21 +156,26 @@ export function NavBar({ className }: SidebarProps) {
                 src="/placeholder.svg?height=40&width=40"
                 alt="Albert Flores"
               />
-              <AvatarFallback>AF</AvatarFallback>
+              <AvatarFallback>
+                {fullName
+                  .split(" ")
+                  .map((n: any) => n[0])
+                  .join("")
+                  .toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
-                Albert Flores
+                {fullName}
               </p>
-              <p className="text-xs text-gray-500 truncate">
-                albertflores@gmail.com
-              </p>
+              <p className="text-xs text-gray-500 truncate">{userEmail}</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
             className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={handleLogout}
           >
             <LogOut className="mr-2 h-4 w-4" />
             Log Out

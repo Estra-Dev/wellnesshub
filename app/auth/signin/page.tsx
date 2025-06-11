@@ -10,6 +10,7 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/Auth-Provider";
 
 const page = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,42 +19,50 @@ const page = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Basic validation
-    if (!email || !password) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
-
-    if (!email.includes("@")) {
-      setError("Please enter a valid email address");
-      setIsLoading(false);
-      return;
-    }
-
     try {
+      // Basic validation
+      if (!email || !password) {
+        setError("Please fill in all fields");
+        setIsLoading(false);
+        return;
+      }
+
+      if (!email.includes("@")) {
+        setError("Please enter a valid email address");
+        setIsLoading(false);
+        return;
+      }
+
       // Simulate API call for authentication
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // For demo purposes, accept any email/password combination
       // In real app, this would be an actual API call
-      console.log("Login attempt:", { email, password });
+      const userData = {
+        id: "user-123",
+        email: email,
+        name: "Albert Flores",
+        fullName: "Albert Flores",
+        avatar: "/placeholder.svg?height=40&width=40",
+      };
+
+      login(userData);
 
       // Simulate successful login
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userEmail", email);
+      // localStorage.setItem("isAuthenticated", "true");
+      // localStorage.setItem("userEmail", email);
 
       // Redirect to dashboard
-      router.push("/");
+      // router.push("/");
     } catch (err) {
       setError("Login failed. Please check your credentials and try again.");
-    } finally {
       setIsLoading(false);
     }
   };
